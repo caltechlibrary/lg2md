@@ -121,6 +121,7 @@ type Guide struct {
 	XMLName     xml.Name   `json:"-"`
 	ID          int        `json:"id" xml:"id"`
 	Type        string     `json:"type" xml:"type"`
+	Name        string     `json:"name" xml:"name"`
 	Description string     `json:"description" xml:"description,innerXML"`
 	URL         string     `json:"url" xml:"url"`
 	Owner       *Owner     `json:"owner" xml:"owner"`
@@ -193,6 +194,25 @@ type Asset struct {
 	LastName        string `json:"last_name,omitempty" xml:"last_name,omitempty"`
 	EMail           string `json:"email,omitempty" xml:"email,omitempty"`
 	MoreInfo        string `json:"more_info,omitempty" xml:"more_info,omitempty"`
+}
+
+func Slugify(s string) string {
+	sluggy := map[string]string{
+		" ": "-",
+		"'": "",
+		"@": "",
+		"!": "",
+		"?": "",
+		"&": "",
+		":": "",
+		";": "",
+		"<": "",
+		">": "",
+	}
+	for k, v := range sluggy {
+		s = strings.Replace(s, k, v, -1)
+	}
+	return strings.ToLower(s)
 }
 
 func Clean(src []byte) []byte {

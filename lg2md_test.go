@@ -26,11 +26,12 @@ import (
 func TestDecode(t *testing.T) {
 	libguide1 := &LibGuides{}
 
-	src, err := ioutil.ReadFile("testdata/example_export.xml")
+	src, err := ioutil.ReadFile("testdata/export_example.xml")
 	if err != nil {
 		t.Errorf("%s\n", err)
 		t.FailNow()
 	}
+	src = Clean(src)
 
 	err = xml.Unmarshal(src, &libguide1)
 	if err != nil {
@@ -43,5 +44,15 @@ func TestDecode(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	fmt.Printf("%+v\n%+v\n", libguide2, libguide2)
+	s1, err := libguide1.ToJSON()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	s2, err := libguide2.ToJSON()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	fmt.Printf("%s\n%s\n", s1, s2)
 }

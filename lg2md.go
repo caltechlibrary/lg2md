@@ -20,7 +20,11 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"net/url"
+	"strings"
+)
+
+const (
+	Version = "v0.0.0-prototype"
 )
 
 const (
@@ -30,13 +34,14 @@ const (
 type LibGuides struct {
 	XMLName  xml.Name   `json:"-"`
 	Custmer  *Customer  `json:"customer" xml:"customer"`
-	Site     *Site      `json:"site" xml:"libguides"`
-	Accounts []*Account `json:"accounts" xml:"accounts"`
-	Groups   []*Group   `json:"groups" xml:"groups"`
-	Subjects []*Subject `json:"subjects" xml:"subjects"`
-	Tags     []*Tag     `json:"tags" xml:"tags"`
-	Vendors  string     `json:"vendors" xml:"vendors"` //FIXME: Vendors probably needs to be defined as a struct type...
-	Guides   []*Guide   `json:"guides" xml:"guides"`
+	Site     *Site      `json:"site" xml:"site"`
+	Accounts []*Account `json:"accounts" xml:"accounts>account"`
+	Groups   []*Group   `json:"groups" xml:"groups>group"`
+	Subjects []*Subject `json:"subjects" xml:"subjects>subject"`
+	Tags     []*Tag     `json:"tags" xml:"tags>tag"`
+	//FIXME: Vendors probably needs to be defined as a struct type...
+	Vendors string   `json:"vendors" xml:"vendors"`
+	Guides  []*Guide `json:"guides" xml:"guides>guide"`
 }
 
 type Customer struct {
@@ -44,7 +49,7 @@ type Customer struct {
 	ID       int      `json:"id" xml:"id"`
 	Type     string   `json:"type" xml:"type"`
 	Name     string   `json:"name" xml:"name"`
-	URL      *url.URL `json:"url" xml:"url"`
+	URL      string   `json:"url" xml:"url"`
 	City     string   `json:"city" xml:"city"`
 	State    string   `json:"state" xml:"state"`
 	Country  string   `json:"country" xml:"country"`
@@ -70,33 +75,40 @@ type Account struct {
 	EMail     string   `json:"email" xml:"email"`
 	FirstName string   `json:"first_name" xml:"first_name"`
 	LastName  string   `json:"last_name" xml:"last_name"`
-	Nickname  string   `json:"nickname" xml:"nickname"`
-	Signature string   `json:"signature" xml:"signature"`
-	Image     string   `json:"image" xml:"image"`
-	Address   string   `json:"address" xml:"address"`
-	Phone     string   `json:"phone" xml:"phone"`
-	Skype     string   `json:"skype" xml:"skype"`
-	Website   string   `json:"website" xml:"website"`
-	Created   string   `json:"created" xml:"created"`
-	Updated   string   `json:"updated" xml:"updated"`
+	Nickname  string   `json:"nickname,omitempty" xml:"nickname,omitempty"`
+	Signature string   `json:"signature,omitempty" xml:"signature,omitempty"`
+	Image     string   `json:"image,omitempty" xml:"image,omitempty"`
+	Address   string   `json:"address,omitempty" xml:"address,omitempty"`
+	Phone     string   `json:"phone,omitempty" xml:"phone,omitempty"`
+	Skype     string   `json:"skype,omitempty" xml:"skype,omitempty"`
+	Website   string   `json:"website,omitempty" xml:"website,omitempty"`
+	Created   string   `json:"created,omitempty" xml:"created,omitempty"`
+	Updated   string   `json:"updated,omitempty" xml:"updated,omitempty"`
+}
+
+type Owner struct {
+	XMLName   xml.Name `json:"-"`
+	ID        int      `json:"id" xml:"id"`
+	EMail     string   `json:"email" xml:"email"`
+	FirstName string   `json:"first_name" xml:"first_name"`
+	LastName  string   `json:"last_name" xml:"last_name"`
 }
 
 type Group struct {
 	XMLName     xml.Name `json:"-"`
 	ID          int      `json:"id" xml:"id"`
 	Type        string   `json:"type" xml:"type"`
-	Description string   `json:"description" xml:"description,innerXML"`
-	//Password    string     `json:"passord" xml:"password"`
-	Name    string `json:"name" xml:"name"`
-	Created string `json:"created" xml:"created"`
-	Updated string `json:"updated" xml:"updated"`
+	Description string   `json:"description,omitempty" xml:"description,innerXML,omitempty"`
+	Name        string   `json:"name" xml:"name"`
+	Created     string   `json:"created,omitempty" xml:"created,omitempty"`
+	Updated     string   `json:"updated,omitempty" xml:"updated,omitempty"`
 }
 
 type Subject struct {
 	XMLName xml.Name `json:"-"`
 	ID      int      `json:"id" xml:"id"`
 	Name    string   `json:"name" xml:"name"`
-	URL     *url.URL `json:"url" xml:"url"`
+	URL     string   `json:"url" xml:"url"`
 }
 
 type Tag struct {
@@ -110,17 +122,17 @@ type Guide struct {
 	ID          int        `json:"id" xml:"id"`
 	Type        string     `json:"type" xml:"type"`
 	Description string     `json:"description" xml:"description,innerXML"`
-	URL         *url.URL   `json:"url" xml:"url"`
-	Owner       *Account   `json:"owner" xml:"owner"`
+	URL         string     `json:"url" xml:"url"`
+	Owner       *Owner     `json:"owner" xml:"owner"`
 	Group       *Group     `json:"group" xml:"group"`
-	Redirect    *url.URL   `json:"redirect" xml:"redirect"`
+	Redirect    string     `json:"redirect,omitempty" xml:"redirect,omitempty"`
 	Status      string     `json:"status" xml:"status"`
 	Published   string     `json:"published" xml:"published"`
-	Subjects    []*Subject `json:"subject" xml:"subject"`
-	Tags        []*Tag     `json:"tags" xml:"tags"`
-	Created     string     `json:"created" xml:"created"`
-	Updated     string     `json:"updated" xml:"updated"`
-	Pages       []*Page    `json:"pages" xml:"pages"`
+	Subjects    []*Subject `json:"subject,omitempty" xml:"subjects>subject,omitepty"`
+	Tags        []*Tag     `json:"tags,omitempty" xml:"tags>tag,omitempty"`
+	Created     string     `json:"created" xml:"created,omitepmty"`
+	Updated     string     `json:"updated" xml:"updated,omitempty"`
+	Pages       []*Page    `json:"pages,omitempty" xml:"pages>page,omitempty"`
 }
 
 type Page struct {
@@ -128,15 +140,15 @@ type Page struct {
 	ID           int      `json:"id" xml:"id"`
 	Name         string   `json:"name" xml:"name"`
 	Description  string   `json:"description" xml:"description,innerXML"`
-	URL          *url.URL `json:"url" xml:"url"`
-	Redirect     *url.URL `json:"redirect" xml:"redirect"`
+	URL          string   `json:"url" xml:"url"`
+	Redirect     string   `json:"redirect,omitempty" xml:"redirect,omitempty"`
 	SourcePageID int      `json:"source_page_id" xml:"source_page_id"`
 	ParentPageID int      `json:"parent_page_id" xml:"parent_page_id"`
 	Position     int      `json:"position" xml:"position"`
 	Hidden       int      `json:"hidden" xml:"hidden"`
 	Created      string   `json:"created" xml:"created"`
 	Updated      string   `json:"updated" xml:"updated"`
-	Boxes        []*Box   `json:"boxes" xml:"boxes"`
+	Boxes        []*Box   `json:"boxes" xml:"boxes>box"`
 }
 
 type Box struct {
@@ -145,25 +157,26 @@ type Box struct {
 	Name        string   `json:"name" xml:"name"`
 	Type        string   `json:"type" xml:"type"`
 	Description string   `json:"description" xml:"description,innerXML"`
-	URL         *url.URL `json:"url" xml:"url"`
-	Owner       *Account `json:"owner" xml:"owner"`
+	URL         string   `json:"url" xml:"url"`
+	Owner       *Owner   `json:"owner" xml:"owner"`
 	MapID       int      `json:"map_id" xml:"map_id"`
 	Column      int      `json:"column" xml:"column"`
 	Position    int      `json:"position" xml:"position"`
 	Hidden      int      `json:"hidden" xml:"hidden"`
 	Created     string   `json:"created" xml:"created"`
 	Updated     string   `json:"updated" xml:"updated"`
-	Assets      []*Asset `json:"assets" xml:"assets"`
+	Assets      []*Asset `json:"assets,omitempty" xml:"assets>asset,omitempty"`
 }
 
 type Asset struct {
 	XMLName     xml.Name `json:"-"`
 	ID          int      `json:"id" xml:"id"`
 	Name        string   `json:"name" xml:"name"`
+	Type        string   `json:"type" xml:"type"`
 	Description string   `json:"description" xml:"description,innerXML"`
-	URL         *url.URL `json:"url" xml:"url"`
-	Redirect    *url.URL `json:"redirect" xml:"redirect"`
-	Owner       *Account `json:"owner" xml:"owner"`
+	URL         string   `json:"url" xml:"url"`
+	Redirect    string   `json:"redirect,omitempty" xml:"redirect,omitempty"`
+	Owner       *Owner   `json:"owner" xml:"owner"`
 	MapID       int      `json:"map_id" xml:"map_id"`
 	Position    int      `json:"position" xml:"position"`
 	Created     string   `json:"created" xml:"created"`
@@ -175,11 +188,23 @@ type Asset struct {
 	CoverURL        string `json:"cover_url,omitempty" xml:"cover_url,omitempty"`
 	Enabled         int    `json:"enabled,omitempty" xml:"enabled,omitempty"`
 	ISBN            string `json:"isbn,omitempty" xml:"isbn,omitempty"`
-	PublicationDate string `json:"publication_date" xml:"publication_date"`
+	PublicationDate string `json:"publication_date,omitempty" xml:"publication_date,omitempty"`
 	FirstName       string `json:"first_name,omitempty" xml:"first_name,omitempty"`
 	LastName        string `json:"last_name,omitempty" xml:"last_name,omitempty"`
 	EMail           string `json:"email,omitempty" xml:"email,omitempty"`
 	MoreInfo        string `json:"more_info,omitempty" xml:"more_info,omitempty"`
+}
+
+func Clean(src []byte) []byte {
+	// Map out offensive chars from MS included content...
+	return []byte(strings.Map(func(r rune) rune {
+		switch r {
+		case 0x0001, 0x000B, 0x000C, 0x0003, 0x0012, 0x0013:
+			return -1
+		default:
+			return r
+		}
+	}, fmt.Sprintf("%s", src)))
 }
 
 func Decode(src []byte) (*LibGuides, error) {

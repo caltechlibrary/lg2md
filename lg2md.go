@@ -33,7 +33,7 @@ const (
 
 type LibGuides struct {
 	XMLName  xml.Name   `json:"-"`
-	Custmer  *Customer  `json:"customer" xml:"customer"`
+	Customer *Customer  `json:"customer" xml:"customer"`
 	Site     *Site      `json:"site" xml:"site"`
 	Accounts []*Account `json:"accounts" xml:"accounts>account"`
 	Groups   []*Group   `json:"groups" xml:"groups>group"`

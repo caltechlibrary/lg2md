@@ -18,7 +18,6 @@ package lg2md
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -44,15 +43,22 @@ func TestDecode(t *testing.T) {
 		t.Error(err)
 		t.FailNow()
 	}
-	s1, err := libguide1.ToJSON()
+	_, err = libguide1.ToJSON()
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
-	s2, err := libguide2.ToJSON()
+	_, err = libguide2.ToJSON()
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
-	fmt.Printf("%s\n%s\n", s1, s2)
+
+	if libguide1.Customer == nil {
+		t.Errorf("libguide1 Customer is nil")
+	}
+	if libguide2.Customer == nil {
+		t.Errorf("libguide2 Customer is nil")
+	}
+	//FIXME: Go through and test the various other fields and substructures
 }

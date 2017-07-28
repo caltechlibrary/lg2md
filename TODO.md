@@ -10,3 +10,5 @@
     + option to create directories of blobs
 
 ## Someday, Maybe
+
++ [ ] rename package more sensibly (e.g. lg2 since it is about more than converting to Markdown)

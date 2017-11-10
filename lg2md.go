@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	Version = "v0.0.0-prototype"
+	Version = `v0.0.0-prototype`
 )
 
 const (
